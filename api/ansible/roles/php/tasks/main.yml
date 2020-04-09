@@ -1,0 +1,71 @@
+- name: set epel repository
+  yum: name=epel-release
+- name: set remi repository
+  yum: name=http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+- name: install php7.2
+  yum:
+    name: "{{ packages }}"
+    enablerepo: remi,remi-php72,epel
+    state: present
+  vars:
+    packages:
+    - php
+    - php-cli
+    - php-mysqlnd
+    - php-zip
+    - php-devel
+    - php-gd
+    - php-mcrypt
+    - php-mbstring
+    - php-curl
+    - php-xml
+    - php-pear
+    - php-json
+    - php-pdo
+    - php-pecl-xdebug
+    - php-intl
+    - php-soap
+
+- name: Set php.ini timezone
+  lineinfile: >-
+    dest='/etc/php.ini'
+    regexp=';date.timezone ='
+    line='date.timezone = Asia/Tokyo'
+
+- name: Set php.ini session max life time
+  lineinfile: >-
+    dest='/etc/php.ini'
+    regexp='session.gc_maxlifetime ='
+    line='session.gc_maxlifetime = 1800'
+
+- name: Set php.ini memory limit
+  lineinfile: >-
+    dest='/etc/php.ini'
+    regexp='memory_limit ='
+    line='memory_limit = 512M'
+
+- name: Set php.ini post max size
+  lineinfile: >-
+    dest='/etc/php.ini'
+    regexp='post_max_size ='
+    line='post_max_size = 30M'
+
+- name: Set php.ini upload max filesize
+  lineinfile: >-
+    dest='/etc/php.ini'
+    regexp='upload_max_filesize ='
+    line='upload_max_filesize = 12M'
+
+- name: Set php.ini xdebug
+  lineinfile:
+    dest='/etc/php.ini'
+    line={{ item }}
+  with_items:
+    - 'xdebug.remote_autostart = true'
+    - 'xdebug.remote_connect_back = true'
+    - 'xdebug.remote_enable = true'
+    - 'xdebug.remote_host = 192.168.33.1'
+    - 'xdebug.remote_port = 9000'
+
+- name: Restart httpd
+  shell: systemctl restart httpd

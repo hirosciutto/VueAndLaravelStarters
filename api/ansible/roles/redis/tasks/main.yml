@@ -1,0 +1,20 @@
+- name: Install redis
+  yum: name=redis state=present
+- name: Chkconfig redis
+  command: systemctl enable redis.service
+- name: Start redis
+  command: systemctl start redis.service
+
+- name: Install supervisor
+  yum: name=supervisor state=latest
+- name: Copy configuration file
+  template:
+    src: ../templates/laravel-worker.ini
+    dest: /etc/supervisord.d/
+    owner: root
+    group: root
+    mode: 0755
+#- name: Chkconfig supervisor
+#  command: systemctl enable supervisord.service
+#- name: Start supervisor
+#  command: systemctl start supervisord.service

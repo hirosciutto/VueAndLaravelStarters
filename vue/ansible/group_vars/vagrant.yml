@@ -1,0 +1,26 @@
+---
+ip: 192.168.33.100
+apache_listen_ip: "*"
+apache_listen_port_ssl: 443
+apache_create_vhosts: true
+apache_vhosts_filename: "ssl.conf"
+apache_ignore_missing_ssl_certificate: true
+apache_ssl_protocol: "All -SSLv2 -SSLv3"
+apache_ssl_cipher_suite: "AES256+EECDH:AES256+EDH"
+apache_vhosts_ssl:
+  - servername: "vm.ofstest.com:443"
+    documentroot: "/vagrant/dist"
+    certificate_file: "/etc/pki/tls/certs/localhost.crt"
+    certificate_key_file: "/etc/pki/tls/private/localhost.key"
+    certificate_chain_file: "/etc/pki/tls/certs/ca-bundle.crt"
+    extra_parameters: |
+      AddType text/html .html
+      DirectoryIndex index.html
+      AddDefaultCharset UTF-8
+      <Directory "/vagrant/dist/">
+        EnableSendfile off
+        AllowOverride All
+        Require all granted
+        Options FollowSymLinks Indexes
+      </Directory>
+

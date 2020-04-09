@@ -1,0 +1,32 @@
+---
+- name: remove nodejs
+  yum:
+    name: nodejs
+    state: absent
+
+- name: Setup nodejs
+  get_url:
+    url: https://rpm.nodesource.com/setup_10.x
+    dest: /tmp/installer
+
+- name: Install nodejs
+  yum:
+    enablerepo: epel
+    name: nodejs
+    state: latest
+
+# - name: Install forever
+#   npm:
+#     name: "forever"
+#     global: true
+#     state: latest
+
+- name: vue Install global
+  npm:
+    name: "@vue/cli@4.2.2"
+    global: true
+
+- name: vue serve setup global
+  npm:
+    name: "@vue/cli-service-global"
+    global: true

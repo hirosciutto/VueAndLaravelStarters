@@ -1,0 +1,11 @@
+---
+- name: Vagrant Environment Configuration
+  hosts: all
+  vars_files:
+    - group_vars/vagrant.yml
+  become: yes
+  user: vagrant
+  roles:
+    - common
+    - httpd
+    - node

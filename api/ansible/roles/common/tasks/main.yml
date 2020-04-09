@@ -1,0 +1,40 @@
+- name: install common
+  yum:
+    state: latest
+    name:
+      - vim
+      - wget
+      - zlib
+      - zlib-devel
+      - openssl
+      - openssl-devel
+      - libselinux-python
+      - gcc-c++
+      - libpng-devel
+      - zip
+      - unzip
+      - autossh
+
+- name: Disable selinux
+  selinux: state=disabled
+
+- name: Disable firewalld
+  command: systemctl disable firewalld
+
+- name: Stop firewalld
+  command: systemctl stop firewalld
+
+- name: Set timezone to Asia/Tokyo
+  timezone:
+    name: Asia/Tokyo
+
+- name: Install chrony
+  yum: name=chrony state=present
+
+- name: Set chronyd default configuration
+  template: src={{item.src}} dest={{item.dest}}
+  with_items:
+  - { src: '../templates/chrony.conf', dest: '/etc/' }
+
+- name: Chkconfig chronyd
+  command: systemctl enable chronyd

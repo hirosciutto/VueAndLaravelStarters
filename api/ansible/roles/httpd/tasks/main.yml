@@ -1,0 +1,26 @@
+---
+- name: Install httpd
+  yum: name=httpd state=present
+
+- name: Chkconfig httpd
+  command: systemctl enable httpd
+
+- name: Remove files
+  file: path="{{ item }}" state=absent
+  with_items:
+  - /var/www/html
+  - /etc/httpd/conf.d/welcome.conf
+  - /etc/httpd/conf.d/autoindex.conf
+
+- name: Set httpd default configuration
+  template: src={{item.src}} dest={{item.dest}}
+  with_items:
+  - { src: '../templates/httpd.conf', dest: '/etc/httpd/conf/' }
+
+- name: Set virtual host configuration
+  template: src={{item.src}} dest={{item.dest}}
+  with_items:
+  - { src: '../templates/virtual.conf', dest: '/etc/httpd/conf.d/' }
+
+- name: Restart httpd
+  command: systemctl restart httpd.service

@@ -1,0 +1,86 @@
+---
+- name: Remove mariadb
+  yum: name=mariadb-libs state=absent
+
+- name: Add repository
+  yum: name=http://dev.mysql.com/get/mysql57-community-release-el6-7.noarch.rpm state=present
+
+- name: Install mysql
+  yum:
+    enablerepo: mysql56-community
+    disablerepo: mysql57-community
+    state: present
+    name: "{{ item }}"
+  with_items:
+  - mysql-community-server
+  - mysql-community-client
+  - mysql-community-common
+  - mysql-community-libs
+  - mysql-community-libs-compat
+  - MySQL-python
+  - libselinux-python
+
+- name: Run mysql
+  service: name=mysqld state=started enabled=yes
+
+- name: Initial setting check
+  shell: "mysqladmin --defaults-file={{ mysql_default_file }} ping | grep alive"
+  ignore_errors: true
+  register: init_flag
+
+- name: Delete anonymous user
+  mysql_user:
+    name: ""
+    host: "{{ item }}"
+    state: absent
+  with_items:
+  - localhost.localdomain
+  - localhost
+  when: init_flag.rc == 1
+
+- name: Change root password
+  mysql_user:
+    name: root
+    password: "{{ mysql_root_password }}"
+    host: "{{ item }}"
+  with_items:
+  - 127.0.0.1
+  - ::1
+  - localhost.localdomain
+  - localhost
+  when: init_flag.rc == 1
+
+- name: Copy configuration file
+  template:
+    src: ../templates/my.cnf.j2
+    dest: "{{ mysql_default_file }}"
+    owner: root
+    group: root
+    mode: 0600
+  when: init_flag.rc == 1
+
+- name: Create a new database
+  mysql_db:
+    name: "{{ item }}"
+    state: present
+  with_items:
+  - srs_customer
+  - srs_cusotmer_test
+  when: init_flag.rc == 1
+
+# - name: Copy database dump file
+#   copy:
+#     src: "{{ item }}"
+#     dest: /tmp
+#   with_items:
+#     - ../dump/create.sql
+#   when: init_flag.rc == 1
+
+# - name: Restore database
+#   mysql_db:
+#     name: srs_customer
+#     state: import
+#    target: "{{ item }}"
+#  with_items:
+#    - /tmp/create.sql
+#  when: init_flag.rc == 1

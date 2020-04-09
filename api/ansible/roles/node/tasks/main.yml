@@ -1,0 +1,16 @@
+---
+- name: remove nodejs
+  yum:
+    name: nodejs
+    state: absent
+
+- name: Setup nodejs
+  get_url:
+    url: https://rpm.nodesource.com/setup_10.x
+    dest: /tmp/installer
+
+- name: Install nodejs
+  yum:
+    enablerepo: epel
+    name: nodejs
+    state: latest

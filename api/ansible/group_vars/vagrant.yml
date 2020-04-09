@@ -1,0 +1,4 @@
+---
+ip: 192.168.33.101
+mysql_root_password: vagrant
+mysql_default_file: /root/.my.cnf
