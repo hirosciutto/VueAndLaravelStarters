@@ -7,9 +7,9 @@
   user: vagrant
   roles:
     - common
-    - httpd
-    - php
-    - mysql
-    - composer
-    - node
-    - redis
+    # - httpd
+    # - php
+    # - mysql
+    # - composer
+    # - node
+    # - redis

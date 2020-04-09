@@ -7,5 +7,5 @@
   user: vagrant
   roles:
     - common
-    - httpd
-    - node
+    # - httpd
+    # - node
